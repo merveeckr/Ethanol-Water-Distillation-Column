@@ -9,7 +9,9 @@ Ankara Üniversitesi Gıda Mühendisliği Bölümü, FDE 450 Process Design ders
 1. GitHub'da repo sayfasını açın
 2. Sağ üstteki yeşil **Code** butonuna tıklayın
 3. **Download ZIP** seçin
-4. İndirilen `.zip` dosyasını bir klasöre çıkartın
+4. İndirilen `.zip` dosyasını bir klasöre **çıkartın** (ZIP içinden direkt açmayın)
+
+> ⚠️ **Önemli:** ZIP dosyasına çift tıklayıp içinden `index.html`'i direkt açmayın. Önce **"Tümünü Ayıkla"** ile dosyaları bir klasöre çıkartın, sonra `index.html`'e tıklayın. Aksi hâlde görseller ve tablolar düzgün görüntülenmez.
 
 **Seçenek 2 — Git ile klonla**
 
