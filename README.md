@@ -49,3 +49,7 @@ Sayfada animasyonlu sayılar, interaktif grafikler (VLE eğrisi, McCabe-Thiele d
 Ayşe Kübra Kılıç · Bilge Vildan Şahin · Elif Gözde Onayci · İbrahim Erkoç · Şükran Bahtiyar
 
 **Danışmanlar:** Prof. Dr. Özge Şakıyan Demirkol · Prof. Dr. Aslı İşçi Yakan
+
+## Web Sitesi
+
+Site **Merve Çakır** tarafından tasarlanıp geliştirilmiştir.
