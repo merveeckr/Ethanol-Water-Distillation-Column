@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Ethanol Distillation — Group 7</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ─── RESET & BASE ──────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --c1:#0a0e1a;--c2:#0d1b2a;--c3:#112240;
+  --teal:#00d4aa;--blue:#4f8ef7;--purple:#a855f7;
+  --amber:#f59e0b;--rose:#f43f5e;
+  --glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.10);
+  --border:rgba(255,255,255,.10);--border2:rgba(0,212,170,.30);
+  --text:#e2e8f0;--muted:#94a3b8;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--c1);color:var(--text);overflow-x:hidden;line-height:1.7}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--c1)}
+::-webkit-scrollbar-thumb{background:var(--teal);border-radius:3px}
+
+/* ─── NAV ──────────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;
+  background:rgba(10,14,26,.80);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);transition:all .3s}
+nav.scrolled{background:rgba(10,14,26,.96)}
+.nav-brand{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:.95rem;color:#fff;text-decoration:none}
+.nav-dot{width:8px;height:8px;background:var(--teal);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,170,.6)}50%{box-shadow:0 0 0 6px rgba(0,212,170,0)}}
+.nav-links{display:flex;gap:1.8rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:500;letter-spacing:.4px;
+  transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;
+  background:var(--teal);transition:width .3s;border-radius:2px}
+.nav-links a:hover{color:var(--teal)}
+.nav-links a:hover::after{width:100%}
+
+/* ─── HERO ──────────────────────────────────────────── */
+#hero{position:relative;height:100vh;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;text-align:center}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+.hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,170,.12) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
+.hero-content{position:relative;z-index:2;padding:2rem;max-width:860px}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(0,212,170,.10);border:1px solid rgba(0,212,170,.35);
+  border-radius:30px;padding:.35rem 1rem;font-size:.78rem;font-weight:600;
+  color:var(--teal);letter-spacing:.6px;margin-bottom:1.5rem;
+  animation:fadeDown .8s ease forwards}
+.hero-badge svg{width:14px;height:14px;fill:var(--teal)}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+.hero-title{font-size:clamp(2rem,5vw,3.6rem);font-weight:900;line-height:1.15;
+  background:linear-gradient(135deg,#fff 0%,var(--teal) 50%,var(--blue) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  opacity:0;animation:fadeUp .9s .2s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:600px;margin:1rem auto 2rem;
+  opacity:0;animation:fadeUp .9s .4s ease forwards}
+.hero-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;
+  opacity:0;animation:fadeUp .9s .6s ease forwards}
+.hero-chip{background:var(--glass);border:1px solid var(--border);
+  border-radius:8px;padding:.35rem .85rem;font-size:.78rem;color:var(--muted)}
+.scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  z-index:2;opacity:0;animation:fadeUp .9s 1.2s ease forwards;
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;color:var(--muted);font-size:.75rem}
+.scroll-arrow{width:24px;height:24px;border:2px solid var(--teal);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ─── SECTION STRUCTURE ─────────────────────────────── */
+section{padding:6rem 0;position:relative;z-index:1}
+.container{max-width:1120px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.section-tag{display:inline-block;background:rgba(0,212,170,.10);
+  color:var(--teal);font-size:.72rem;font-weight:700;letter-spacing:1.4px;
+  text-transform:uppercase;border-radius:20px;padding:.25rem .8rem;margin-bottom:.7rem}
+.section-title{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;
+  background:linear-gradient(90deg,#fff,var(--muted));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:.6rem;line-height:1.2}
+.section-desc{color:var(--muted);max-width:620px;font-size:.93rem;margin-bottom:3rem}
+/* ─── SCROLL ANIMATIONS ──────────────────────────────── */
+.reveal        {opacity:0;transform:translateY(44px);  transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1)}
+.reveal-left   {opacity:0;transform:translateX(-60px); transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1)}
+.reveal-right  {opacity:0;transform:translateX(60px);  transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1)}
+.reveal-scale  {opacity:0;transform:scale(.88);        transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.reveal.visible,.reveal-left.visible,.reveal-right.visible,.reveal-scale.visible{opacity:1;transform:none}
+
+/* stagger delays applied by JS */
+.stagger-item  {opacity:0;transform:translateY(36px) scale(.97);
+  transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1)}
+.stagger-item.visible{opacity:1;transform:none}
+
+/* section title animated underline */
+.section-title-wrap{position:relative;display:inline-block}
+.title-line{display:block;height:3px;width:0;background:linear-gradient(90deg,var(--teal),var(--blue));
+  border-radius:3px;margin-top:.4rem;transition:width 1s cubic-bezier(.16,1,.3,1) .3s}
+.title-line.visible{width:100%}
+
+/* table row stagger */
+.tbl-row{opacity:0;transform:translateX(-20px);
+  transition:opacity .5s ease,transform .5s ease}
+.tbl-row.visible{opacity:1;transform:none}
+
+/* chart box pop */
+.chart-pop{opacity:0;transform:translateY(30px) scale(.96);
+  transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+.chart-pop.visible{opacity:1;transform:none}
+
+/* glow pulse on stat cards when visible */
+@keyframes cardGlow{0%{box-shadow:0 0 0 0 rgba(0,212,170,.0)}
+  50%{box-shadow:0 0 24px 4px rgba(0,212,170,.18)}
+  100%{box-shadow:0 0 0 0 rgba(0,212,170,.0)}}
+.stat-card.glowed{animation:cardGlow 1.2s ease forwards}
+
+/* ─── STAT CARDS ─────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:3rem}
+.stat-card{background:var(--glass);border:1px solid var(--border);border-radius:16px;
+  padding:1.4rem 1.2rem;position:relative;overflow:hidden;
+  transition:transform .3s,border-color .3s,box-shadow .3s;cursor:default}
+.stat-card::before{content:'';position:absolute;inset:0;opacity:0;
+  background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(79,142,247,.08));
+  transition:opacity .3s}
+.stat-card:hover{transform:translateY(-5px);border-color:var(--border2);
+  box-shadow:0 12px 32px rgba(0,212,170,.12)}
+.stat-card:hover::before{opacity:1}
+.stat-icon{font-size:1.5rem;margin-bottom:.7rem}
+.stat-val{font-size:2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-lbl{font-size:.78rem;color:var(--muted);font-weight:500;margin-top:.3rem;line-height:1.4}
+
+/* ─── GLASS CARD ─────────────────────────────────────── */
+.glass-card{background:var(--glass);border:1px solid var(--border);border-radius:18px;
+  padding:1.8rem;transition:transform .3s,border-color .3s,box-shadow .3s;overflow:hidden;position:relative}
+.glass-card::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.03),transparent);pointer-events:none}
+.glass-card:hover{transform:translateY(-4px);border-color:var(--border2);
+  box-shadow:0 16px 40px rgba(0,212,170,.10)}
+.card-icon-wrap{width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:1rem}
+.card h3{font-size:.97rem;font-weight:700;color:#fff;margin-bottom:.5rem}
+.card p,.glass-card p{font-size:.86rem;color:var(--muted);line-height:1.7}
+
+/* ─── GRID LAYOUTS ───────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem}
+@media(max-width:700px){.g2{grid-template-columns:1fr}}
+
+/* ─── TABLES ─────────────────────────────────────────── */
+.table-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--border);
+  box-shadow:0 4px 20px rgba(0,0,0,.3)}
+table{width:100%;border-collapse:collapse;font-size:.84rem}
+thead th{background:linear-gradient(90deg,var(--c3),#1a3a5c);
+  color:var(--teal);padding:.8rem 1rem;text-align:left;
+  font-size:.78rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+tbody tr{background:var(--glass);transition:background .2s}
+tbody tr:hover{background:rgba(0,212,170,.06)}
+tbody td{padding:.65rem 1rem;color:var(--text);border-bottom:1px solid var(--border)}
+tbody tr:last-child td{border-bottom:none}
+.pill{display:inline-block;padding:.15rem .55rem;border-radius:20px;font-size:.72rem;font-weight:700}
+.pill-teal{background:rgba(0,212,170,.15);color:var(--teal);border:1px solid rgba(0,212,170,.3)}
+.pill-blue{background:rgba(79,142,247,.15);color:var(--blue);border:1px solid rgba(79,142,247,.3)}
+.pill-amber{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+
+/* ─── CHART BOX ──────────────────────────────────────── */
+.chart-box{background:var(--glass);border:1px solid var(--border);border-radius:18px;
+  padding:1.6rem;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.chart-box h4{font-size:.88rem;font-weight:700;color:var(--teal);
+  margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
+.chart-box canvas{max-height:260px}
+
+/* ─── EQUATION ───────────────────────────────────────── */
+.eq{background:rgba(79,142,247,.08);border-left:3px solid var(--blue);
+  border-radius:0 10px 10px 0;padding:.8rem 1.4rem;margin:.7rem 0;
+  color:#a5b4fc;overflow-x:auto}
+.eq .katex{font-size:1.05rem}
+.eq .katex-display{margin:.2rem 0}
+
+/* ─── STEPS ──────────────────────────────────────────── */
+.steps{display:flex;flex-direction:column;gap:1.2rem}
+.step{display:flex;gap:1rem;align-items:flex-start}
+.step-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:.88rem;color:#0a0e1a;box-shadow:0 4px 12px rgba(0,212,170,.3)}
+.step-body h4{font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.2rem}
+.step-body p{font-size:.82rem;color:var(--muted)}
+
+/* ─── HIGHLIGHT BOX ──────────────────────────────────── */
+.hl-box{background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(79,142,247,.08));
+  border:1px solid rgba(0,212,170,.25);border-radius:16px;padding:1.8rem 2rem;margin-bottom:2.5rem}
+.hl-box h3{color:var(--teal);margin-bottom:.7rem;font-size:1.05rem;font-weight:700}
+.hl-box p{font-size:.9rem;color:var(--text);line-height:1.8}
+.hl-box strong{color:#fff}
+
+/* ─── PROGRESS / BAR ─────────────────────────────────── */
+.prog-wrap{margin-bottom:1.2rem}
+.prog-lbl{display:flex;justify-content:space-between;font-size:.8rem;
+  font-weight:600;color:var(--muted);margin-bottom:.4rem}
+.prog-track{height:8px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden}
+.prog-fill{height:100%;border-radius:20px;width:0;
+  background:linear-gradient(90deg,var(--teal),var(--blue));
+  transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+
+/* ─── COLUMN DIAGRAM ─────────────────────────────────── */
+.col-diagram{display:flex;flex-direction:column;align-items:center;gap:0;width:100%;max-width:260px;margin:0 auto}
+.col-seg{width:80px;display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;color:rgba(255,255,255,.9);
+  border-left:3px solid;border-right:3px solid;position:relative;cursor:default}
+.col-seg span{position:absolute;left:calc(100% + 8px);white-space:nowrap;
+  font-size:.72rem;color:var(--muted);font-weight:500}
+.col-top{height:32px;border-radius:8px 8px 0 0;background:linear-gradient(135deg,rgba(79,142,247,.4),rgba(79,142,247,.2));border-color:var(--blue);border-top:3px solid var(--blue)}
+.col-rect{background:repeating-linear-gradient(0deg,rgba(0,212,170,.15) 0px,rgba(0,212,170,.15) 10px,rgba(0,212,170,.05) 10px,rgba(0,212,170,.05) 20px);border-color:var(--teal)}
+.col-feed{background:rgba(245,158,11,.25);border-color:var(--amber);border-top:2px dashed var(--amber);border-bottom:2px dashed var(--amber)}
+.col-strip{background:repeating-linear-gradient(0deg,rgba(168,85,247,.15) 0px,rgba(168,85,247,.15) 10px,rgba(168,85,247,.05) 10px,rgba(168,85,247,.05) 20px);border-color:var(--purple)}
+.col-bot{height:40px;border-radius:0 0 8px 8px;background:linear-gradient(135deg,rgba(244,63,94,.3),rgba(244,63,94,.15));border-color:var(--rose);border-bottom:3px solid var(--rose)}
+.col-lbl{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.4rem}
+
+/* ─── TABS ───────────────────────────────────────────── */
+.tabs{display:flex;gap:.5rem;margin-bottom:1.8rem;flex-wrap:wrap}
+.tab-btn{background:var(--glass);border:1px solid var(--border);border-radius:30px;
+  padding:.45rem 1.1rem;font-size:.8rem;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:all .25s}
+.tab-btn:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+.tab-btn.active{background:linear-gradient(135deg,var(--teal),var(--blue));
+  border-color:transparent;color:#0a0e1a;font-weight:700}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ─── FLOATING MOLECULES (HERO BG) ──────────────────── */
+.molecule{position:absolute;border-radius:50%;pointer-events:none;z-index:1;opacity:.4}
+
+/* ─── ECONOMICS RING ─────────────────────────────────── */
+.econ-ring-wrap{display:flex;justify-content:center;align-items:center;
+  flex-direction:column;gap:.3rem;margin-bottom:1.5rem}
+.econ-total{font-size:1.4rem;font-weight:900;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.econ-total-lbl{font-size:.75rem;color:var(--muted)}
+
+/* ─── LINE DIVIDER ───────────────────────────────────── */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:3rem 0}
+
+/* ─── RESULT NUM ─────────────────────────────────────── */
+.r-num{font-size:3.2rem;font-weight:900;line-height:1;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.r-unit{font-size:.85rem;color:var(--muted);margin-top:.2rem}
+.r-lbl{font-size:.82rem;color:var(--text);margin-top:.4rem}
+
+/* ─── BIG RESULT GRID ────────────────────────────────── */
+.big-result{text-align:center;padding:1.5rem;background:var(--glass);
+  border:1px solid var(--border);border-radius:18px;
+  transition:border-color .3s,box-shadow .3s}
+.big-result:hover{border-color:var(--border2);box-shadow:0 8px 30px rgba(0,212,170,.12)}
+
+/* ─── FOOTER ─────────────────────────────────────────── */
+footer{background:var(--c2);border-top:1px solid var(--border);
+  padding:3rem 2rem;text-align:center}
+footer p{font-size:.82rem;color:var(--muted);line-height:2}
+footer strong{color:var(--teal)}
+
+/* ─── BACK TOP ───────────────────────────────────────── */
+#backTop{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;
+  width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--teal),var(--blue));
+  color:#0a0e1a;font-size:1.1rem;font-weight:800;
+  box-shadow:0 4px 16px rgba(0,212,170,.35);
+  display:none;align-items:center;justify-content:center;
+  transition:transform .2s,box-shadow .2s}
+#backTop:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,212,170,.5)}
+
+/* ─── SECTION ACCENTS ────────────────────────────────── */
+.section-accent{position:absolute;border-radius:50%;pointer-events:none;filter:blur(80px);opacity:.08;z-index:0}
+.sa1{width:500px;height:500px;background:var(--teal);top:-100px;right:-100px}
+.sa2{width:400px;height:400px;background:var(--blue);bottom:-100px;left:-100px}
+
+/* ─── GLOW TEXT ──────────────────────────────────────── */
+.glow{text-shadow:0 0 30px rgba(0,212,170,.5)}
+
+/* ─── TYPEWRITER ─────────────────────────────────────── */
+.cursor{display:inline-block;width:3px;height:.9em;background:var(--teal);
+  vertical-align:text-bottom;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- ─── NAV ──────────────────────────────────────────── -->
+<nav id="nav">
+  <a class="nav-brand" href="#hero"><div class="nav-dot"></div>Group 7 · Distillation</a>
+  <ul class="nav-links">
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#methods">Methods</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#economics">Economics</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-glow"></div>
+
+  <div class="hero-content">
+    <h1 class="hero-title" id="heroTitle"></h1>
+    <p class="hero-sub">
+      Corn-Based Ethanol Plant · Department of Food Engineering · Group 7 · 03.06.2026
+    </p>
+    <div class="hero-chips">
+      <span class="hero-chip">👩‍🔬 Ayşe Kübra Kılıç</span>
+      <span class="hero-chip">👩‍🔬 Bilge Vildan Şahin</span>
+      <span class="hero-chip">👩‍🔬 Elif Gözde Onayci</span>
+      <span class="hero-chip">👨‍🔬 İbrahim Erkoç</span>
+      <span class="hero-chip">👩‍🔬 Şükran Bahtiyar</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll to explore</span>
+    <div class="scroll-arrow">↓</div>
+  </div>
+</section>
+
+<!-- ─── SUMMARY ───────────────────────────────────────── -->
+<section id="summary" style="position:relative;overflow:hidden">
+  <div class="section-accent sa1"></div>
+  <div class="section-accent sa2"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="reveal">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Project Summary</h2>
+        <span class="title-line"></span>
+      </div>
+      <p class="section-desc">Preliminary design of a continuous atmospheric ethanol-water distillation column producing fuel-grade bioethanol from corn fermentation broth.</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⚗️</div>
+        <div class="stat-val counter" data-target="100000" data-suffix=" L/day">0</div>
+        <div class="stat-lbl">Production Capacity<br>fuel-grade ethanol</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💎</div>
+        <div class="stat-val counter" data-target="95.6" data-suffix=" wt%" data-dec="1">0</div>
+        <div class="stat-lbl">Product Purity<br>x<sub>D</sub> = 0.894 mol fr.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌽</div>
+        <div class="stat-val counter" data-target="10.8" data-suffix=" wt%" data-dec="1">0</div>
+        <div class="stat-lbl">Feed Ethanol Content<br>corn fermentation broth</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-val counter" data-target="32" data-suffix="×10⁶ L">0</div>
+        <div class="stat-lbl">Annual Production<br>320 operating days/year</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📐</div>
+        <div class="stat-val counter" data-target="1.6" data-suffix=" m" data-dec="1">0</div>
+        <div class="stat-lbl">Column Diameter<br>Souders-Brown correlation</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📏</div>
+        <div class="stat-val counter" data-target="12" data-suffix=" m">0</div>
+        <div class="stat-lbl">Column Height<br>12 actual sieve trays</div>
+      </div>
+    </div>
+
+    <div class="hl-box reveal">
+      <h3>Key Results at a Glance</h3>
+      <p>
+        Operating reflux ratio <strong>R = 3.51</strong> (1.5 × R<sub>min</sub>). McCabe-Thiele analysis yielded
+        <strong>9 theoretical stages</strong> including the reboiler — equivalent to <strong>12 actual sieve trays</strong>
+        at 70% tray efficiency. Feed enters at <strong>tray 6 from top</strong>. Column diameter
+        <strong>1.60 m</strong> at 80% flood (V<sub>max</sub> = 2.05 m/s). Bottoms ethanol loss
+        <strong>0.00015 mol fr.</strong> — near-complete recovery. Total Grassroots Capital <strong>₺21.46 million</strong>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── INTRODUCTION ──────────────────────────────────── -->
+<section id="intro" style="position:relative;overflow:hidden">
+  <div class="section-accent" style="width:300px;height:300px;background:var(--purple);top:50%;right:0;opacity:.06"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="reveal">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Introduction</h2>
+        <span class="title-line"></span>
+      </div>
+      <p class="section-desc">Context, motivation, and scientific background behind the distillation column design.</p>
+    </div>
+
+    <div class="g4">
+      <div class="glass-card card">
+        <div class="card-icon-wrap" style="background:rgba(0,212,170,.12)">🌍</div>
+        <h3>Bioethanol as Renewable Fuel</h3>
+        <p>Fossil fuel depletion and GHG concerns have accelerated global demand for bioethanol. Corn dry-grind fermentation is the dominant large-scale production route due to its high ethanol yield and simple process configuration.</p>
+      </div>
+      <div class="glass-card card">
+        <div class="card-icon-wrap" style="background:rgba(79,142,247,.12)">🔬</div>
+        <h3>Non-Ideal VLE Behavior</h3>
+        <p>The ethanol-water system forms an azeotrope at ≈ 89.4 mol% EtOH (95.6 wt%) at atmospheric pressure. This places a hard thermodynamic ceiling on single-pressure distillation and makes VLE data accuracy critical.</p>
+      </div>
+      <div class="glass-card card">
+        <div class="card-icon-wrap" style="background:rgba(168,85,247,.12)">📐</div>
+        <h3>McCabe-Thiele Method</h3>
+        <p>The graphical McCabe-Thiele method uses the equilibrium curve together with rectifying, stripping, and q-line operating lines to step off theoretical stages — the most widely applied approach for binary distillation design.</p>
+      </div>
+      <div class="glass-card card">
+        <div class="card-icon-wrap" style="background:rgba(245,158,11,.12)">🏭</div>
+        <h3>Project Scope</h3>
+        <p>Design a continuous sieve-tray column for 100,000 L/day of 95.6 wt% fuel-grade ethanol. Covers mass balances, reflux selection, stage analysis, feed tray location, Souders-Brown hydraulics, and preliminary economics.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── METHODS ────────────────────────────────────────── -->
+<section id="methods" style="position:relative;overflow:hidden">
+  <div class="section-accent sa1" style="opacity:.06"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="reveal">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Materials &amp; Methods</h2>
+        <span class="title-line"></span>
+      </div>
+      <p class="section-desc">Systematic step-by-step design procedure, governing equations, and key assumptions.</p>
+    </div>
+
+    <div class="g2">
+      <div class="reveal-left">
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>Design Basis</h4>
+              <p>Target: 100,000 L/day ethanol · 320 days/year · Feed as saturated liquid (q = 1) · 1 atm operating pressure.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>Thermophysical Properties</h4>
+              <p>VLE data from Perry's Handbook. Liquid / vapor densities at column top conditions (T ≈ 78.4 °C, P = 1 atm). Ideal gas law for ρ<sub>V</sub>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>Overall &amp; Component Mass Balances</h4>
+              <p>F = D + B and F·x<sub>F</sub> = D·x<sub>D</sub> + B·x<sub>W</sub>. All streams converted to molar basis (MW<sub>EtOH</sub> = 46.07, MW<sub>H₂O</sub> = 18.02 kg/kmol).</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <h4>Reflux Ratio &amp; Operating Lines</h4>
+              <p>R<sub>min</sub> from Underwood / graphical method. R = 1.5 × R<sub>min</sub>. Rectifying and stripping lines plotted from x<sub>D</sub> and x<sub>W</sub>.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <h4>Stage Count &amp; Column Sizing</h4>
+              <p>McCabe-Thiele graphic stepping. N<sub>actual</sub> = (N<sub>th</sub> − 1)/η, η = 70%. Diameter via Souders-Brown correlation at 80% flood.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reveal-right">
+        <h3 style="color:var(--teal);font-size:.95rem;font-weight:700;margin-bottom:1rem;">Governing Equations</h3>
+        <div class="eq">$$F = D + B$$</div>
+        <div class="eq">$$F \cdot x_F = D \cdot x_D + B \cdot x_W$$</div>
+        <div class="eq">$$y = \frac{R}{R+1}\,x + \frac{x_D}{R+1} \quad \text{(rectifying)}$$</div>
+        <div class="eq">$$q\text{-line}\;(q=1):\quad x = z_F \quad \text{(vertical)}$$</div>
+        <div class="eq">$$N_{\text{actual}} = \frac{N_{\text{th}} - 1}{\eta}$$</div>
+        <div class="eq">$$V_{\max} = C_{SB} \cdot \sqrt{\frac{\rho_L - \rho_V}{\rho_V}}$$</div>
+        <div class="eq">$$D_c = \sqrt{\frac{4\,A_c}{\pi}}$$</div>
+
+        <div style="margin-top:1.4rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:1rem;font-size:.82rem;color:var(--muted);">
+          <span style="color:var(--teal);font-weight:700;">Assumptions · </span>
+          Constant molar overflow (CMO) · Saturated liquid feed ($q = 1$) · 70% overall tray efficiency · 80% of flood velocity · Downcomer $= 10\%$ of $A_c$ · Tray spacing $= 0.5\ \text{m}$ · AISI 316L stainless steel
+        </div>
+      </div>
+    </div>
+
+    <!-- REFERENCE FIGURES FROM REPORT -->
+    <div style="margin-top:3rem">
+      <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1.5rem">
+        <span style="display:inline-block;width:4px;height:1.4rem;background:linear-gradient(180deg,var(--teal),var(--blue));border-radius:2px"></span>
+        <h3 style="color:#fff;font-size:1.05rem;font-weight:700">Reference Figures &amp; Data Tables Used</h3>
+      </div>
+      <div class="g3">
+        <!-- Table 1: Density -->
+        <div class="reveal" style="grid-column:span 2">
+          <div style="background:var(--glass);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)">
+            <div style="padding:.8rem 1.2rem;border-bottom:1px solid var(--border);font-size:.82rem;font-weight:700;color:var(--teal)">Table 1 — Ethanol-Water Density-Concentration Data at 20°C (Perry's Handbook)</div>
+            <img src="images/image2.jpg" alt="Ethanol-water density table" style="width:100%;display:block">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── RESULTS ────────────────────────────────────────── -->
+<section id="results" style="position:relative;overflow:hidden">
+  <div class="section-accent sa2" style="opacity:.07"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="reveal">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Results &amp; Calculations</h2>
+        <span class="title-line"></span>
+      </div>
+      <p class="section-desc">Complete quantitative outcomes from mass balances, VLE analysis, McCabe-Thiele staging, and column hydraulics.</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs reveal">
+      <button class="tab-btn active" onclick="switchTab(0)">Stream Balances</button>
+      <button class="tab-btn" onclick="switchTab(1)">Reflux &amp; Stages</button>
+      <button class="tab-btn" onclick="switchTab(2)">Column Hydraulics</button>
+      <button class="tab-btn" onclick="switchTab(3)">Equipment</button>
+    </div>
+
+    <!-- TAB 0: STREAMS -->
+    <div class="tab-panel active" id="tab0">
+      <div class="g2" style="margin-bottom:2rem">
+        <div class="table-wrap reveal">
+          <table>
+            <thead>
+              <tr><th>Stream</th><th>Mass (kg/h)</th><th>Molar (kmol/h)</th><th>x mol fr.</th><th>wt%</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Feed (F)</strong> <span class="pill pill-amber">q = 1</span></td><td>29,699</td><td>1,541.4</td><td>0.045</td><td>10.8%</td></tr>
+              <tr><td><strong>Distillate (D)</strong> <span class="pill pill-teal">Product</span></td><td>3,345</td><td>77.6</td><td>0.894</td><td>95.6%</td></tr>
+              <tr><td><strong>Bottoms (B)</strong> <span class="pill pill-blue">Wastewater</span></td><td>26,354</td><td>1,462.1</td><td>0.00015</td><td>0.04%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="reveal">
+          <div class="g2" style="gap:1rem;margin-bottom:1rem">
+            <div class="big-result reveal">
+              <div class="r-num counter" data-target="3345" data-suffix="">0</div>
+              <div class="r-unit">kg/h</div>
+              <div class="r-lbl">Distillate Flow Rate</div>
+            </div>
+            <div class="big-result reveal">
+              <div class="r-num counter" data-target="29699" data-suffix="">0</div>
+              <div class="r-unit">kg/h</div>
+              <div class="r-lbl">Feed Flow Rate</div>
+            </div>
+          </div>
+          <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:1.2rem;font-size:.83rem;color:var(--muted);">
+            <div style="color:var(--teal);font-weight:700;margin-bottom:.5rem">Component Balance Check</div>
+            EtOH in feed: 3,207 kg/h &nbsp;→&nbsp; EtOH in distillate: 3,197 kg/h<br>
+            EtOH recovery: <strong style="color:#fff">99.7%</strong> &nbsp;|&nbsp; Water in bottoms: 26,350 kg/h<br>
+            Bottoms loss (EtOH): 10.5 kg/h &nbsp;=&nbsp; <strong style="color:#fff">0.3%</strong> of feed ethanol
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-box chart-pop">
+        <h4>Ethanol Distribution Across Streams</h4>
+        <canvas id="streamChart" style="max-height:200px"></canvas>
+      </div>
+
+      
+
+    </div>
+
+    <!-- TAB 1: REFLUX & STAGES -->
+    <div class="tab-panel" id="tab1">
+      <div class="g2" style="margin-bottom:2rem">
+        <div class="reveal">
+          <div class="table-wrap" style="margin-bottom:1.2rem">
+            <table>
+              <thead><tr><th>Parameter</th><th>Value</th><th>Method</th></tr></thead>
+              <tbody>
+                <tr><td>$x_F$ (feed mole fr.)</td><td>0.045</td><td>Mass balance</td></tr>
+                <tr><td>$y^*$ at $x_F$</td><td>0.293</td><td>VLE interpolation</td></tr>
+                <tr><td>$R_{\min}$ (analytical)</td><td>2.42</td><td>$\dfrac{x_D - y^*}{y^* - z_F}$</td></tr>
+                <tr><td>$R_{\min}$ (graphical)</td><td>2.34</td><td>McCabe-Thiele diagram</td></tr>
+                <tr><td><strong style="color:var(--teal)">$R$ (operating)</strong></td><td><strong>3.51</strong></td><td>$1.5 	imes R_{\min}$</td></tr>
+                <tr><td>Rectifying slope</td><td>0.778</td><td>$R/(R+1)$</td></tr>
+                <tr><td>Rectifying intercept</td><td>0.198</td><td>$x_D/(R+1)$</td></tr>
+                <tr><td>Stripping slope</td><td>&#8776; 5.18</td><td>$L'/V'$ graphical</td></tr>
+                <tr><td>Theoretical stages</td><td><strong>9</strong></td><td>incl. reboiler</td></tr>
+                <tr><td>Tray efficiency $\eta$</td><td>70%</td><td>Literature estimate</td></tr>
+                <tr><td><strong style="color:var(--teal)">Actual trays</strong></td><td><strong>12</strong></td><td>$(9-1)/0.70 	o 12$</td></tr>
+                <tr><td>Feed tray</td><td><strong>6th from top</strong></td><td>$q$-line intersection</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+            <div style="padding:.7rem 1rem;border-bottom:1px solid var(--border);font-size:.82rem;font-weight:700;color:var(--teal)">
+              Graph — McCabe-Thiele Diagram (Without Stage Steps)
+            </div>
+            <embed src="mccabe_thiele_no_stages.pdf" type="application/pdf" width="100%" height="440px" style="display:block">
+          </div>
+        </div>
+
+        <div class="reveal">
+          <div class="chart-box" style="margin-bottom:1.2rem">
+            <h4>McCabe-Thiele Diagram</h4>
+            <canvas id="mccabeChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="chart-box chart-pop">
+          <h4>VLE Curve &#8212; Ethanol-Water at 1 atm</h4>
+          <canvas id="vleChart"></canvas>
+        </div>
+        <div class="chart-box chart-pop">
+          <h4>Tray Count: Theoretical vs Actual</h4>
+          <canvas id="trayChart"></canvas>
+        </div>
+      </div>
+
+      <!-- ACTUAL McCABE-THIELE DIAGRAM FROM REPORT -->
+      <div class="reveal" style="margin-top:2rem">
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1.2rem">
+          <span style="display:inline-block;width:4px;height:1.4rem;background:linear-gradient(180deg,var(--teal),var(--blue));border-radius:2px"></span>
+          <h3 style="color:#fff;font-size:1.05rem;font-weight:700">Graph 1 &#8212; Actual McCabe-Thiele Diagram (from Report)</h3>
+        </div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);padding:1rem">
+          <img src="images/image4.png" alt="McCabe-Thiele Diagram with 9 theoretical stages"
+            style="width:100%;display:block;border-radius:12px;transition:transform .4s ease"
+            onmouseover="this.style.transform='scale(1.015)'"
+            onmouseout="this.style.transform='scale(1)'">
+        </div>
+        <p style="font-size:.8rem;color:var(--muted);margin-top:.8rem;text-align:center">
+          Stage stepping from x<sub>D</sub> = 0.894 to x<sub>W</sub> = 0.00015 &middot; <strong style="color:var(--teal)">9 theoretical stages</strong> incl. reboiler &middot; R = 3.51 &middot; Feed tray 6th from top
+        </p>
+      </div>
+    </div>
+
+    <!-- TAB 2: HYDRAULICS -->
+    <div class="tab-panel" id="tab2">
+      <div class="g2" style="margin-bottom:2rem">
+        <div class="reveal">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Hydraulic Parameter</th><th>Value</th><th>Unit</th></tr></thead>
+              <tbody>
+                <tr><td>Vapor molar flow (V)</td><td>350</td><td>kmol/h</td></tr>
+                <tr><td>Vapor mass flow</td><td>15,086</td><td>kg/h</td></tr>
+                <tr><td>Liquid mass flow (L)</td><td>11,741</td><td>kg/h</td></tr>
+                <tr><td>$\overline{M}_{\text{vap}}$ (avg)</td><td>43.10</td><td>kg/kmol</td></tr>
+                <tr><td>$\rho_V$ (ideal gas)</td><td>1.50</td><td>kg/m³</td></tr>
+                <tr><td>$\rho_L$ (mixture)</td><td>742</td><td>kg/m³</td></tr>
+                <tr><td>Flow parameter $F_{LV}$</td><td>0.0348</td><td>—</td></tr>
+                <tr><td>Tray spacing $T_s$</td><td>0.5 (1.64 ft)</td><td>m</td></tr>
+                <tr><td>$C_{SB}$</td><td>0.092</td><td>m/s</td></tr>
+                <tr><td>$V_{\max}$ (flood)</td><td>2.05</td><td>m/s</td></tr>
+                <tr><td>$V_{\text{op}}$ (80% flood)</td><td>1.64</td><td>m/s</td></tr>
+                <tr><td>$Q_v$</td><td>2.79</td><td>m³/s</td></tr>
+                <tr><td>Active area $A_b$</td><td>1.71</td><td>m²</td></tr>
+                <tr><td>Total area $A_c$</td><td>1.90</td><td>m²</td></tr>
+                <tr><td><strong style="color:var(--teal)">Column diameter $D_c$</strong></td><td><strong>1.60</strong></td><td><strong>m</strong></td></tr>
+                <tr><td><strong style="color:var(--teal)">Column height H</strong></td><td><strong>12</strong></td><td><strong>m</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="reveal" style="display:flex;flex-direction:column;gap:1.2rem">
+          <!-- Column Diagram -->
+          <div class="chart-box" style="padding:2rem 1.5rem">
+            <h4>Column Schematic</h4>
+            <div style="display:flex;align-items:flex-start;gap:2rem;justify-content:center">
+              <div class="col-diagram">
+                <div style="text-align:center;font-size:.7rem;color:var(--teal);margin-bottom:.3rem;font-weight:700">CONDENSER</div>
+                <div class="col-seg col-top" style="height:28px"><span style="left:calc(100% + 10px);color:var(--blue)">D = 3,345 kg/h ↑</span></div>
+                <div class="col-seg col-rect" style="height:70px"><span style="color:var(--teal)">Rectifying<br>5 trays</span></div>
+                <div class="col-seg col-feed" style="height:22px"><span style="color:var(--amber)">← Feed (tray 6)</span></div>
+                <div class="col-seg col-strip" style="height:70px"><span style="color:var(--purple)">Stripping<br>7 trays</span></div>
+                <div class="col-seg col-bot" style="height:28px"><span style="left:calc(100% + 10px);color:var(--rose)">B = 26,354 kg/h ↓</span></div>
+                <div style="text-align:center;font-size:.7rem;color:var(--rose);margin-top:.3rem;font-weight:700">REBOILER</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--glass);border:1px solid var(--border);border-radius:12px;padding:1.2rem">
+            <div style="color:var(--teal);font-size:.82rem;font-weight:700;margin-bottom:.8rem">Height Breakdown</div>
+            <div class="prog-wrap">
+              <div class="prog-lbl"><span>Tray section (11 spaces × 0.5 m)</span><span>5.5 m</span></div>
+              <div class="prog-track"><div class="prog-fill" data-w="45.8"></div></div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-lbl"><span>Condenser/Reboiler allowance</span><span>4.0 m</span></div>
+              <div class="prog-track"><div class="prog-fill" data-w="33.3"></div></div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-lbl"><span>Bottom sump</span><span>1.5 m</span></div>
+              <div class="prog-track"><div class="prog-fill" data-w="12.5"></div></div>
+            </div>
+            <div class="prog-wrap">
+              <div class="prog-lbl"><span>Top disengagement</span><span>1.0 m</span></div>
+              <div class="prog-track"><div class="prog-fill" data-w="8.3"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: EQUIPMENT -->
+    <div class="tab-panel" id="tab3">
+      <div class="g3">
+        <div class="glass-card card reveal" style="padding:0;overflow:hidden">
+          <img src="images/image7.jpeg" alt="Industrial distillation column" style="width:100%;height:160px;object-fit:cover;display:block">
+          <div style="padding:1.4rem">
+            <div class="card-icon-wrap" style="background:rgba(0,212,170,.12)">🏗️</div>
+            <h3>Distillation Column</h3>
+            <p>1.60 m I.D. × 12 m total height · 12 sieve trays · 0.5 m tray spacing · AISI 316L stainless steel · 1 atm · Continuous fractional distillation</p>
+          </div>
+        </div>
+        <div class="glass-card card reveal" style="padding:0;overflow:hidden">
+          <img src="images/image8.jpeg" alt="Shell-and-tube heat exchanger" style="width:100%;height:160px;object-fit:cover;display:block">
+          <div style="padding:1.4rem">
+            <div class="card-icon-wrap" style="background:rgba(79,142,247,.12)">❄️</div>
+            <h3>Overhead Condenser</h3>
+            <p>Total condenser · TEMA standard shell-and-tube · Fully liquefies enriched ethanol vapor · Feeds reflux drum · Utility cooling water</p>
+          </div>
+        </div>
+        <div class="glass-card card reveal" style="padding:0;overflow:hidden">
+          <img src="images/image10.jpeg" alt="Kettle reboiler" style="width:100%;height:160px;object-fit:cover;display:block">
+          <div style="padding:1.4rem">
+            <div class="card-icon-wrap" style="background:rgba(244,63,94,.12)">🔥</div>
+            <h3>Partial Reboiler</h3>
+            <p>Kettle-type partial reboiler · Low-pressure utility steam · Boil-up: 15,086 kg/h vapor return · Bottoms draw: 26,354 kg/h</p>
+          </div>
+        </div>
+        <div class="glass-card card reveal" style="padding:0;overflow:hidden">
+          <img src="images/image8.jpeg" alt="Pre-heater heat exchanger" style="width:100%;height:160px;object-fit:cover;display:block;object-position:right">
+          <div style="padding:1.4rem">
+            <div class="card-icon-wrap" style="background:rgba(245,158,11,.12)">⚡</div>
+            <h3>Pre-Heater (E-100)</h3>
+            <p>Heats 29,732 kg/h feed to bubble point ≈ 95 °C · Reduces reboiler load · TEMA standard shell-and-tube heat exchanger</p>
+          </div>
+        </div>
+        <div class="glass-card card reveal" style="padding:0;overflow:hidden">
+          <img src="images/image11.jpeg" alt="Centrifugal pumps" style="width:100%;height:160px;object-fit:cover;display:block">
+          <div style="padding:1.4rem">
+            <div class="card-icon-wrap" style="background:rgba(168,85,247,.12)">💧</div>
+            <h3>Pump &amp; Piping</h3>
+            <p>Heavy-duty centrifugal pumps · VFD control · Required NPSH for high-volume continuous flow · AISI 316L piping and fittings</p>
+          </div>
+        </div>
+        <div class="glass-card card reveal">
+          <div class="card-icon-wrap" style="background:rgba(16,185,129,.12)">🖥️</div>
+          <h3>SCADA Control</h3>
+          <p>Centralized supervisory control · Temperature, pressure, level, &amp; composition loops · Ensures 95.6 wt% purity specification continuously</p>
+        </div>
+      </div>
+
+      <!-- PROCESS FLOW DIAGRAM -->
+      <div class="reveal" style="margin-top:3rem">
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1.2rem">
+          <span style="display:inline-block;width:4px;height:1.4rem;background:linear-gradient(180deg,var(--teal),var(--blue));border-radius:2px"></span>
+          <h3 style="color:#fff;font-size:1.05rem;font-weight:700">Proposed Design Drawing</h3>
+        </div>
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:18px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)">
+          <img src="images/image6.png" alt="Distillation Column Process Flow Diagram"
+            style="width:100%;display:block;border-radius:18px;transition:transform .4s ease"
+            onmouseover="this.style.transform='scale(1.02)'"
+            onmouseout="this.style.transform='scale(1)'">
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1rem">
+          <span class="pill pill-teal">① Feed Stream</span>
+          <span class="pill pill-blue">② Overhead Vapor</span>
+          <span class="pill pill-blue">③ Condensate</span>
+          <span class="pill pill-teal">④ Reflux</span>
+          <span class="pill pill-teal">⑤ Distillate</span>
+          <span class="pill pill-amber">⑥ Liquid to Reboiler</span>
+          <span class="pill pill-amber">⑦ Boil-up</span>
+          <span class="pill pill-amber">⑧ Bottoms Product</span>
+          <span class="pill pill-blue">⑨ Cooling Water In/Out</span>
+          <span class="pill pill-amber">⑫ Heating Steam</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── ECONOMICS ──────────────────────────────────────── -->
+<section id="economics" style="position:relative;overflow:hidden">
+  <div class="section-accent sa1" style="opacity:.06"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="reveal">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Process Economics</h2>
+        <span class="title-line"></span>
+      </div>
+      <p class="section-desc">Capital cost breakdown using standard chemical engineering cost estimation (Bare Module / Grassroots methodology).</p>
+    </div>
+
+    <div class="g2">
+      <div class="reveal-left">
+        <div class="table-wrap" style="margin-bottom:1.5rem">
+          <table>
+            <thead><tr><th>Cost Category</th><th>Symbol</th><th>Amount (₺)</th></tr></thead>
+            <tbody>
+              <tr><td>Equipment Cost</td><td>C<sub>P</sub></td><td>3,506,043</td></tr>
+              <tr><td>Installation Materials</td><td>C<sub>M</sub></td><td>3,416,564</td></tr>
+              <tr><td>Direct Labor</td><td>C<sub>L</sub></td><td>3,381,033</td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">Total Direct Expenses</td><td><strong>C<sub>D</sub></strong></td><td><strong>10,303,640</strong></td></tr>
+              <tr><td>Freight, Insurance &amp; Tax (8% C<sub>P</sub>)</td><td>C<sub>FIT</sub></td><td>280,483</td></tr>
+              <tr><td>Construction Overhead (70% C<sub>L</sub>)</td><td>C<sub>O</sub></td><td>2,366,723</td></tr>
+              <tr><td>Engineering Expenses (15%(C<sub>P</sub>+C<sub>M</sub>))</td><td>C<sub>E</sub></td><td>1,038,391</td></tr>
+              <tr><td style="color:var(--blue);font-weight:700">Total Indirect Expenses</td><td><strong>C<sub>ID</sub></strong></td><td><strong>3,685,598</strong></td></tr>
+              <tr><td style="color:var(--amber);font-weight:700">Bare Module Cost</td><td><strong>C<sub>BM</sub></strong></td><td><strong>13,989,237</strong></td></tr>
+              <tr><td>Contingency &amp; Fee (18% C<sub>BM</sub>)</td><td>C<sub>CF</sub></td><td>2,518,063</td></tr>
+              <tr><td style="color:var(--purple);font-weight:700">Total Module Cost</td><td><strong>C<sub>TM</sub></strong></td><td><strong>16,507,300</strong></td></tr>
+              <tr><td>Auxiliary Facilities (30% C<sub>TM</sub>)</td><td>C<sub>AF</sub></td><td>4,952,190</td></tr>
+              <tr style="background:rgba(0,212,170,.08)"><td style="color:var(--teal);font-weight:700">Grassroots Capital</td><td><strong>C<sub>GR</sub></strong></td><td><strong style="color:var(--teal)">21,459,490</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="reveal-right" style="display:flex;flex-direction:column;gap:1.5rem">
+        <div class="chart-box">
+          <h4>Cost Breakdown (₺ million)</h4>
+          <canvas id="econChart"></canvas>
+        </div>
+
+        <div style="background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:1.4rem">
+          <div style="color:var(--teal);font-size:.85rem;font-weight:700;margin-bottom:1rem">Share of Grassroots Capital</div>
+          <div class="prog-wrap">
+            <div class="prog-lbl"><span>Equipment C<sub>P</sub></span><span>16.3%</span></div>
+            <div class="prog-track"><div class="prog-fill" data-w="16.3"></div></div>
+          </div>
+          <div class="prog-wrap">
+            <div class="prog-lbl"><span>Installation Materials C<sub>M</sub></span><span>15.9%</span></div>
+            <div class="prog-track"><div class="prog-fill" data-w="15.9"></div></div>
+          </div>
+          <div class="prog-wrap">
+            <div class="prog-lbl"><span>Direct Labor C<sub>L</sub></span><span>15.8%</span></div>
+            <div class="prog-track"><div class="prog-fill" data-w="15.8"></div></div>
+          </div>
+          <div class="prog-wrap">
+            <div class="prog-lbl"><span>Aux. Facilities C<sub>AF</sub></span><span>23.1%</span></div>
+            <div class="prog-track"><div class="prog-fill" data-w="23.1"></div></div>
+          </div>
+          <div class="prog-wrap">
+            <div class="prog-lbl"><span>Construction Overhead C<sub>O</sub></span><span>11.0%</span></div>
+            <div class="prog-track"><div class="prog-fill" data-w="11.0"></div></div>
+          </div>
+          <div class="prog-wrap">
+            <div class="prog-lbl"><span>Contingency &amp; Fee C<sub>CF</sub></span><span>11.7%</span></div>
+            <div class="prog-track"><div class="prog-fill" data-w="11.7"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONCLUSION ────────────────────────────────────── -->
+<section id="conclusion" style="position:relative;overflow:hidden">
+  <div class="section-accent" style="width:400px;height:400px;background:var(--teal);bottom:0;left:50%;opacity:.06"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="reveal">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Conclusion &amp; Recommendations</h2>
+        <span class="title-line"></span>
+      </div>
+      <p class="section-desc">Summary of design outcomes and suggested improvements for future industrial implementation.</p>
+    </div>
+
+    <div class="hl-box reveal">
+      <h3>Design Outcomes</h3>
+      <p>
+        The continuous distillation column successfully meets all design targets.
+        Feed rate <strong>29,699 kg/h</strong> of 10.8 wt% ethanol broth yields <strong>3,345 kg/h</strong> of
+        <strong>95.6 wt%</strong> fuel-grade ethanol (distillate) with only <strong>10.5 kg/h</strong> ethanol lost
+        to the bottoms — a recovery of <strong>99.7%</strong>. The 12-tray sieve column
+        (D<sub>c</sub> = 1.60 m, H = 12 m) provides thermally and hydraulically feasible separation.
+        All results are consistent with literature-based ethanol-water distillation benchmarks.
+      </p>
+    </div>
+
+    <div class="g2">
+      <div class="reveal-left">
+        <div class="table-wrap" style="margin-bottom:1.5rem">
+          <table>
+            <thead><tr><th colspan="2" style="text-align:center;letter-spacing:.3px">Final Design Summary</th></tr></thead>
+            <tbody>
+              <tr><td>Feed rate (F)</td><td><strong>29,699 kg/h</strong></td></tr>
+              <tr><td>Distillate rate (D)</td><td><strong>3,345 kg/h</strong></td></tr>
+              <tr><td>Bottoms rate (B)</td><td><strong>26,354 kg/h</strong></td></tr>
+              <tr><td>Distillate purity</td><td><strong>0.894 mol fr. (95.6 wt%)</strong></td></tr>
+              <tr><td>Bottoms ethanol</td><td><strong>0.00015 mol fr.</strong></td></tr>
+              <tr><td>R (operating)</td><td><strong>3.51</strong></td></tr>
+              <tr><td>Theoretical stages</td><td>9 (incl. reboiler)</td></tr>
+              <tr><td>Actual trays</td><td><strong>12</strong></td></tr>
+              <tr><td>Feed tray</td><td>6th from top</td></tr>
+              <tr><td>Column diameter</td><td><strong>1.60 m</strong></td></tr>
+              <tr><td>Column height</td><td><strong>12 m</strong></td></tr>
+              <tr><td>V<sub>max</sub> (flood)</td><td>2.05 m/s</td></tr>
+              <tr><td>Total Capital C<sub>GR</sub></td><td><strong style="color:var(--teal)">₺21,459,490</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="reveal-right">
+        <h3 style="color:var(--teal);font-size:.97rem;font-weight:700;margin-bottom:1.2rem">Recommendations for Future Work</h3>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">→</div>
+            <div class="step-body">
+              <h4>Heat Integration</h4>
+              <p>Use hot bottoms stream to pre-heat feed — significantly reduces reboiler steam duty and operating cost.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">→</div>
+            <div class="step-body">
+              <h4>Rigorous Simulation</h4>
+              <p>Validate with Aspen Plus using NRTL/UNIQUAC thermodynamics for accurate tray-by-tray composition profiles.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">→</div>
+            <div class="step-body">
+              <h4>Molecular Sieve Dehydration</h4>
+              <p>Add downstream dehydration unit to break the ethanol-water azeotrope and achieve &gt; 99.5 wt% fuel-grade specification.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">→</div>
+            <div class="step-body">
+              <h4>Energy Optimization</h4>
+              <p>Evaluate vapor recompression or pressure-swing distillation to further reduce utility costs at industrial scale.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────── -->
+<footer>
+  <p><strong>FDE 450 Process Design Report III · Group 7</strong></p>
+  <p>Ankara University · Faculty of Engineering · Dept. of Food Engineering · 03 June 2026</p>
+  <p style="margin-top:.5rem;opacity:.6">
+    Ayşe Kübra Kılıç &nbsp;·&nbsp; Bilge Vildan Şahin &nbsp;·&nbsp; Elif Gözde Onayci &nbsp;·&nbsp; İbrahim Erkoç &nbsp;·&nbsp; Şükran Bahtiyar
+  </p>
+  <p style="margin-top:.5rem;opacity:.5;font-size:.75rem">
+    Advisors: Prof.Dr. Özge Şakıyan Demirkol &nbsp;·&nbsp; Prof.Dr. Aslı İşçi Yakan
+  </p>
+</footer>
+
+<button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- ─────────────────────────── SCRIPTS ─────────────────── -->
+<script>
+/* ── NAV SCROLL ──────────────────────────────────────────── */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+  document.getElementById('backTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
+});
+
+/* ── PARTICLE CANVAS ─────────────────────────────────────── */
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let W, H, dots = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initDots() {
+  dots = [];
+  const n = Math.floor((W * H) / 6000);
+  for (let i = 0; i < n; i++) {
+    dots.push({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.6 + .5,
+      vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
+      a: Math.random() * .5 + .25
+    });
+  }
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, W, H);
+  dots.forEach(d => {
+    d.x += d.vx; d.y += d.vy;
+    if (d.x < 0 || d.x > W) d.vx *= -1;
+    if (d.y < 0 || d.y > H) d.vy *= -1;
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,212,170,${d.a})`;
+    ctx.fill();
+  });
+  // draw connecting lines
+  for (let i = 0; i < dots.length; i++) {
+    for (let j = i + 1; j < dots.length; j++) {
+      const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(dots[i].x, dots[i].y);
+        ctx.lineTo(dots[j].x, dots[j].y);
+        ctx.strokeStyle = `rgba(0,212,170,${.22 * (1 - dist/120)})`;
+        ctx.lineWidth = .7;
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawParticles);
+}
+
+resize(); initDots(); drawParticles();
+window.addEventListener('resize', () => { resize(); initDots(); });
+
+/* ── TYPEWRITER ──────────────────────────────────────────── */
+const title = "Design and McCabe-Thiele Analysis of an Ethanol-Water Distillation Column";
+let ti = 0;
+const el = document.getElementById('heroTitle');
+el.style.opacity = 1;
+function type() {
+  if (ti <= title.length) {
+    el.innerHTML = title.slice(0, ti) + (ti < title.length ? '<span class="cursor"></span>' : '');
+    ti++;
+    setTimeout(type, 28);
+  }
+}
+setTimeout(type, 600);
+
+/* ── SCROLL REVEAL ───────────────────────────────────────── */
+const revObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); }
+  });
+}, { threshold: .12 });
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right,.reveal-scale,.chart-pop').forEach(el => revObs.observe(el));
+
+/* ── TITLE UNDERLINE DRAW ────────────────────────────────── */
+const lineObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); lineObs.unobserve(e.target); }
+  });
+}, { threshold: .5 });
+document.querySelectorAll('.title-line').forEach(el => lineObs.observe(el));
+
+/* ── STAGGER GRID CHILDREN ───────────────────────────────── */
+document.querySelectorAll('.stat-grid,.g4,.g3').forEach(grid => {
+  const kids = [...grid.children];
+  kids.forEach(k => k.classList.add('stagger-item'));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        kids.forEach((k, i) => {
+          setTimeout(() => {
+            k.classList.add('visible');
+            if (k.classList.contains('stat-card')) setTimeout(() => k.classList.add('glowed'), 60);
+          }, i * 100);
+        });
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: .08 });
+  obs.observe(grid);
+});
+
+/* ── TABLE ROW STAGGER ───────────────────────────────────── */
+document.querySelectorAll('tbody').forEach(tbody => {
+  const rows = [...tbody.querySelectorAll('tr')];
+  rows.forEach(r => r.classList.add('tbl-row'));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        rows.forEach((r, i) => setTimeout(() => r.classList.add('visible'), i * 50));
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: .05 });
+  obs.observe(tbody);
+});
+
+/* ── COUNTER ANIMATION ───────────────────────────────────── */
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const dec = parseInt(el.dataset.dec || '0');
+  const duration = 1600;
+  const start = performance.now();
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = target * ease;
+    el.textContent = (dec > 0 ? val.toFixed(dec) : Math.round(val).toLocaleString()) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+const countObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { animateCounter(e.target); countObs.unobserve(e.target); }
+  });
+}, { threshold: .5 });
+document.querySelectorAll('.counter').forEach(el => countObs.observe(el));
+
+/* ── PROGRESS BARS ───────────────────────────────────────── */
+const progObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.width = e.target.dataset.w + '%';
+      progObs.unobserve(e.target);
+    }
+  });
+}, { threshold: .3 });
+document.querySelectorAll('.prog-fill').forEach(el => progObs.observe(el));
+
+/* ── TABS ─────────────────────────────────────────────────── */
+function switchTab(idx) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.querySelectorAll('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
+/* ── CHART.JS DATA & CONFIG ──────────────────────────────── */
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.font.family = 'Segoe UI, system-ui, sans-serif';
+
+const vleX = [0,.019,.0721,.0966,.1238,.1661,.2337,.2608,.3273,.3965,.5079,.5198,.5732,.6763,.7472,.8943,1];
+const vleY = [0,.17,.3891,.4375,.4704,.5089,.5445,.558,.583,.6122,.6564,.6599,.6841,.7385,.7815,.8943,1];
+
+// VLE Chart
+new Chart(document.getElementById('vleChart'), {
+  type: 'scatter',
+  data: { datasets: [
+    { label:'VLE Curve', data: vleX.map((x,i)=>({x,y:vleY[i]})), showLine:true,
+      borderColor:'#00d4aa', backgroundColor:'rgba(0,212,170,.15)', pointRadius:4, borderWidth:2.5, tension:.4 },
+    { label:'y = x', data:[{x:0,y:0},{x:1,y:1}], showLine:true, borderColor:'rgba(255,255,255,.2)',
+      borderDash:[4,4], pointRadius:0, borderWidth:1.5 },
+    { label:'Azeotrope', data:[{x:.894,y:.894}], pointRadius:8, backgroundColor:'#f43f5e', borderColor:'#f87171', borderWidth:2 }
+  ]},
+  options: { responsive:true, scales:{
+    x:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'x (liquid mol fr.)'}},
+    y:{min:0,max:1,grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'y (vapor mol fr.)'}}
+  }, plugins:{legend:{labels:{color:'#94a3b8',boxWidth:14}}} }
+});
+
+// McCabe-Thiele
+new Chart(document.getElementById('mccabeChart'), {
+  type:'scatter',
+  data:{ datasets:[
+    { label:'VLE', data:vleX.map((x,i)=>({x,y:vleY[i]})), showLine:true,
+      borderColor:'#4f8ef7', backgroundColor:'transparent', pointRadius:2, borderWidth:2.5, tension:.4 },
+    { label:'y = x', data:[{x:0,y:0},{x:1,y:1}], showLine:true, borderColor:'rgba(255,255,255,.15)',
+      borderDash:[4,4], pointRadius:0, borderWidth:1 },
+    { label:'Rectifying', data:[{x:.045,y:.233},{x:.894,y:.894}], showLine:true,
+      borderColor:'#00d4aa', pointRadius:0, borderWidth:2.5 },
+    { label:'Stripping', data:[{x:.00015,y:.00015},{x:.045,y:.233}], showLine:true,
+      borderColor:'#a855f7', pointRadius:0, borderWidth:2.5 },
+    { label:'q-line (q=1)', data:[{x:.045,y:0},{x:.045,y:.293}], showLine:true,
+      borderColor:'#f59e0b', borderDash:[5,3], pointRadius:0, borderWidth:2 }
+  ]},
+  options:{ responsive:true, scales:{
+    x:{min:0,max:.95,grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'x (mol fr.)'}},
+    y:{min:0,max:.95,grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'y (mol fr.)'}}
+  }, plugins:{legend:{labels:{color:'#94a3b8',boxWidth:12,font:{size:10}}}}}
+});
+
+// Tray Chart
+new Chart(document.getElementById('trayChart'), {
+  type:'bar',
+  data:{
+    labels:['Theoretical\n(incl. reboiler)','Theoretical\nTrays','Actual\nTrays'],
+    datasets:[{ data:[9,8,12],
+      backgroundColor:['rgba(0,212,170,.8)','rgba(79,142,247,.8)','rgba(168,85,247,.8)'],
+      borderRadius:8, borderWidth:0 }]
+  },
+  options:{ responsive:true, scales:{
+    y:{beginAtZero:true,max:15,grid:{color:'rgba(255,255,255,.05)'},ticks:{stepSize:3}},
+    x:{grid:{display:false}}
+  }, plugins:{legend:{display:false}}}
+});
+
+// Stream Chart
+new Chart(document.getElementById('streamChart'), {
+  type:'bar',
+  data:{
+    labels:['Feed','Distillate','Bottoms'],
+    datasets:[
+      { label:'Ethanol (kg/h)', data:[3207,3197,10.5],
+        backgroundColor:'rgba(0,212,170,.75)', borderRadius:[6,6,6], borderWidth:0 },
+      { label:'Water (kg/h)', data:[26498,148,26350],
+        backgroundColor:'rgba(79,142,247,.55)', borderRadius:[6,6,6], borderWidth:0 }
+    ]
+  },
+  options:{ responsive:true, scales:{
+    x:{stacked:false,grid:{display:false}},
+    y:{type:'logarithmic',grid:{color:'rgba(255,255,255,.05)'},title:{display:true,text:'kg/h (log scale)'}}
+  }, plugins:{legend:{labels:{color:'#94a3b8',boxWidth:14}}}}
+});
+
+// Economics Doughnut
+new Chart(document.getElementById('econChart'), {
+  type:'doughnut',
+  data:{
+    labels:['Equipment (C_P)','Installation Mat.','Direct Labor','Indirect Expenses','Contingency','Aux. Facilities'],
+    datasets:[{ data:[3.51,3.42,3.38,3.69,2.52,4.95],
+      backgroundColor:['#00d4aa','#4f8ef7','#a855f7','#f59e0b','#f43f5e','#10b981'],
+      borderWidth:3, borderColor:'#0d1b2a', hoverOffset:8 }]
+  },
+  options:{ responsive:true, cutout:'65%',
+    plugins:{ legend:{position:'bottom',labels:{color:'#94a3b8',boxWidth:12,padding:8,font:{size:9}}},
+      tooltip:{callbacks:{label:ctx=>` ₺${ctx.raw}M`}} }
+  }
+});
+</script>
+</body>
+</html>
